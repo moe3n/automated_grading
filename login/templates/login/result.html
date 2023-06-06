@@ -1,0 +1,43 @@
+{% extends 'base_layout.html' %} {% block content %}
+
+
+
+<table class="table table-info table-hover " style="border-radius: 1.5rem;">
+  <thead>
+    <tr>
+      <th scope="col">Ques No.</th>
+      <th scope="col">Levenshtein</th>
+      <th scope="col">Jaro-Winkler</th>
+      <th scope="col">Hamming</th>
+      <th scope="col">Jaccard</th>
+      <th scope="col">Cosine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>{{ score}}</td>
+      <td>{{ jw1}}</td>
+      <td>{{ ham1 }}</td>
+      <td>{{ jac1}}</td>
+      <td>{{ cos1}}</td>
+      
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>{{ score2}}</td>
+      <td>{{ jw2}}</td>
+      <td>{{ ham2 }}</td>
+      <td>{{ jac2 }}</td>
+      <td>{{ cos2 }}</td>
+      
+    </tr>
+   
+  </tbody>
+</table>
+
+      <br> 
+      <p class="fs-3 text-danger""> Total:{{total_value}}</p>
+      <!-- <button class="btn btn-md btn-info"><a class="" href="http://127.0.0.1:8000/student/answer/">Re-Answer</a> </a> </button> -->
+    </div>
+{%endblock%}
