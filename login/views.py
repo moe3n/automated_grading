@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect, get_list_or_404
+from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.http import HttpResponse
 from database.models import user
-from database.models import subject, exams, score, question_set, question, response, answer
+from login.forms import UserRegistrationForm, SubjectForm, ExamForm
+
+from database.models import subject, exams, score, question_set, question, response, answer, user
 from django.db import connection
 from operator import itemgetter
 from django.contrib import messages
-from . import jaro, jaro2, leven, jac, pre  # hamming
+from . import jaro2, leven, jac, pre  # hamming
 import nltk
 import string
 from nltk.tokenize import word_tokenize
@@ -60,80 +62,58 @@ def homepage(request):
         return render(request, 'login/homepage.html')
 
 
+def register_user(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponse('registration_success')
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, 'login/registration.html', {'form': form})
+
+
+def register_subject(request):
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponse('success')
+    else:
+        form = SubjectForm()
+
+    return render(request, 'courses/subject.html', {'form': form})
+
+
 def login_teacher(request):
-
-    # first query to get the username from the database
-    query = """     
-          SELECT username FROM `database_user` 
-            """
-    data = []
-    # connect with the database
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        #   data = cursor.fetchall()
-    for i in cursor:
-        data.append(i)
-
-    # print("the value is:",data)
-
-    # Second query to get the password from the database
-    query1 = """     
-           SELECT password
-           FROM `database_user`  
-            """
-    data1 = []
-    with connection.cursor() as cursor1:
-        cursor1.execute(query1)
-        #   data1 = cursor1.fetchall()
-
-    for j in cursor1:
-        data1.append(j)
-    # print("the password is:",data1)
-
-    # third query to get the role from the database
-    query2 = """     
-          SELECT role FROM `database_user`
-            """
-    data2 = []
-    with connection.cursor() as cursor2:
-        cursor2.execute(query2)
-
-    for l in cursor2:
-        data2.append(l)
-
-    res = list(map(itemgetter(0), data))
-    res1 = list(map(itemgetter(0), data1))
-    res2 = list(map(itemgetter(0), data2))
-
-    # print("the res list",res)
-    # print("the res1 list",res1)
-    # print("the rest2",res2)
-
+    usrs = user.objects.all()
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
         global uname
         uname = username
-        # print("the user name is",username)
-        # print("the password is",password)
+
+        print("the user name is", username)
+        print("the password is", password)
 
         i = 0
-        k = len(res)
+        k = len(usrs)
         while i < k:
-            if res2[i] == "teacher" or res2[i] == "Teacher":
-                if res[i] == username and res1[i] == password:
+            if usrs[i].role == "teacher" or usrs[i].role == "Teacher":
+                if usrs[i].username == username and usrs[i].password == password:
+                    print(usrs[i].username, usrs[i].password)
                     session_teacher.insert(0, "true")
                     return redirect('/teacher/dashboard/')
                     break
             i = i+1
-
         else:
             messages.info(
                 request, 'Make sure you choose the right login! Invalid username or password!')
             return redirect('/teacher/login/')
 
     if homepage_teacher[0] == "false" and homepage_student[0] == "false":
-        return render(request, 'login/login_teacher.html')
+        return render(request, 'login/login_teacher1.html')
     elif homepage_teacher[0] == "true":
         messages.info(
             request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
@@ -143,89 +123,6 @@ def login_teacher(request):
             request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
         return redirect('/student/dashboard/')
 
-
-def login_student(request):
-    # first query to get the username from the database
-    query = """     
-          SELECT username FROM `database_user` 
-            """
-    data = []
-    # connect with the database
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        #   data = cursor.fetchall()
-    for i in cursor:
-        data.append(i)
-
-    # print("the value is:",data)
-
-    # Second query to get the password from the database
-    query1 = """     
-           SELECT password
-           FROM `database_user`  
-            """
-    data1 = []
-    with connection.cursor() as cursor1:
-        cursor1.execute(query1)
-        #   data1 = cursor1.fetchall()
-
-    for j in cursor1:
-        data1.append(j)
-    # print("the password is:",data1)
-
-    # third query to get the role from the database
-    query2 = """     
-          SELECT role FROM `database_user`
-            """
-    data2 = []
-    with connection.cursor() as cursor2:
-        cursor2.execute(query2)
-
-    for l in cursor2:
-        data2.append(l)
-
-    res = list(map(itemgetter(0), data))
-    res1 = list(map(itemgetter(0), data1))
-    res2 = list(map(itemgetter(0), data2))
-
-    # print("the res list",res)
-    # print("the res1 list",res1)
-    print("the rest2", res2)
-
-    if request.method == "POST":
-        username1 = request.POST['username1']
-        password1 = request.POST['password1']
-        global uname
-        uname = username1
-
-        # print("the user name is",username)
-        # print("the password is",password)
-
-        i = 0
-        k = len(res)
-        while i < k:
-            if res2[i] == "student" or res2[i] == "Student":
-                if res[i] == username1 and res1[i] == password1:
-                    session_student.insert(0, "true")
-                    return redirect('/student/dashboard/')
-                    break
-            i = i+1
-
-        else:
-            messages.info(
-                request, 'Make sure you choose the right login! Invalid username or password!')
-            return redirect('/student/login/')
-
-    if homepage_student[0] == "false" and homepage_teacher[0] == "false":
-        return render(request, 'login/login_student.html')
-    elif homepage_student[0] == "true":
-        messages.info(
-            request, 'You are already logged in so you can not go to the login page,inorder to access the login page please logout!')
-        return redirect('/student/dashboard/')
-    else:
-        messages.info(
-            request, 'You are already logged in so you can not go to the student login page,inorder to access the login page please logout!')
-        return redirect('/teacher/dashboard/')
 
 # teacher dashboard --------------->
 
@@ -257,15 +154,62 @@ def course_detail(request, subject_id):
     else:
         return redirect('/')
 
-    if homepage_teacher[0] == "false" and homepage_student[0] == "false":
-        return render(request, 'login/login_teacher.html')
-    elif homepage_teacher[0] == "true":
+    # if homepage_teacher[0] == "false" and homepage_student[0] == "false":
+    #     return render(request, 'login/login_teacher.html')
+    # elif homepage_teacher[0] == "true":
+    #     messages.info(
+    #         request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
+    #     return redirect('/teacher/dashboard/')
+    # else:
+    #     messages.info(
+    #         request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
+    #     return redirect('/teacher/dashboard/')
+
+
+# def teacher_dashboard(request):
+#     subs = subject.objects.all()
+#     global uname
+#     uname = uname.title()
+#     if session_teacher[0] == "true":
+#         homepage_teacher.insert(0, "true")
+#         return render(request, 'courses/course_list.html', {'subs': subs, 'uname': uname})
+#     else:
+#         return redirect('/')
+
+
+def login_student(request):
+    usrs = user.objects.all()
+    if request.method == "POST":
+        username1 = request.POST['username1']
+        password1 = request.POST['password1']
+        global uname
+        uname = username1
+
+        i = 0
+        k = len(usrs)
+        while i < k:
+            if usrs[i].role == "student" or usrs[i].role == "Student":
+                if usrs[i].username == username1 and usrs[i].password == password1:
+                    print(usrs[i].username, usrs[i].password)
+                    session_student.insert(0, "true")
+                    return redirect('/student/dashboard/')
+                    break
+            i = i+1
+
+        else:
+            messages.info(
+                request, 'Make sure you choose the right login! Invalid username or password!')
+            return redirect('/student/login/')
+
+    if homepage_student[0] == "false" and homepage_teacher[0] == "false":
+        return render(request, 'login/login_student1.html')
+    elif homepage_student[0] == "true":
         messages.info(
-            request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
-        return redirect('/teacher/dashboard/')
+            request, 'You are logged in! Logut to access the Homepage!')
+        return redirect('/student/dashboard/')
     else:
         messages.info(
-            request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
+            request, 'You are logged in! Logut to access the Homepage!')
         return redirect('/teacher/dashboard/')
 
 
@@ -273,6 +217,8 @@ def student_dashboard(request):
     subs = subject.objects.all()
     global uname
     uname = uname.title()
+    # usr = get_object_or_404(user, username=uname)
+    # print("usr:", usr, "usr id", usr.user_id)
     if session_student[0] == "true":
         homepage_student.insert(0, "true")
         return render(request, 'courses/st_course_list.html', {'subs': subs, 'uname': uname})
@@ -309,53 +255,63 @@ def st_course_detail(request, subject_id):
     else:
         return redirect('/')
 
-    # if homepage_teacher[0] == "false" and homepage_student[0] == "false":
-    #     return render(request, 'login/login_teacher.html')
-    # elif homepage_teacher[0] == "true":
-    #     messages.info(
-    #         request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
-    #     return redirect('/student/dashboard/')
-    # else:
-    #     messages.info(
-    #         request, 'You are already logged in so you can not go to the teacher login page,inorder to access the login page please logout!')
-    #     return redirect('/student/dashboard/')
-
-
-def save_exam_id(exam_id):
-    return exam_id
-
 
 def create_exam(request, subject_id):
-
-    subs = subject.objects.all()
     sub = get_list_or_404(subject, subject_id=subject_id)
     sub = sub[0]
-
+    if request.method == 'POST':
+        form = ExamForm(request.POST)
+        if form.is_valid():
+            exam = form.save(commit=False)
+            exam.subject_id_id = sub.subject_id
+            exam.save()
+            exam_id = exam.exam_id
+            return redirect('login:create_set', subject_id=subject_id, exam_id=exam_id)
+    else:
+        form = ExamForm()
     context = {
-        'subject_id': subject_id,
+        'form': form,
         'sub': sub,
     }
-    if request.method == 'POST':
-        exam_id = request.POST['exam_id']
-        exam_name = request.POST['exam_name']
-
-        # create exam obj
-        exam = exams.objects.create(subject_id_id=subject_id,
-                                    exam_id=exam_id, exam_name=exam_name)
-        exam.save()
-        save_exam_id(exam_id)
-        # redirect to a success page
-        return redirect('login:create_set', subject_id=subject_id, exam_id=exam_id)
-
     if session_teacher[0] == "true":
         homepage_teacher.insert(0, "true")
-        return render(request, 'courses/new_exam.html', context)
+        return render(request, 'courses/new_exam2.html', context)
     else:
         return redirect('/')
+    # return render(request, 'login/registration.html', {'form': form})
+
+
+# def legacy_create_exam(request, subject_id):
+
+#     subs = subject.objects.all()
+#     sub = get_list_or_404(subject, subject_id=subject_id)
+#     sub = sub[0]
+
+#     context = {
+#         'subject_id': subject_id,
+#         'sub': sub,
+#     }
+#     if request.method == 'POST':
+#         exam_id = request.POST['exam_id']
+#         exam_name = request.POST['exam_name']
+
+#         # create exam obj
+#         exam = exams.objects.create(subject_id_id=subject_id,
+#                                     exam_name=exam_name)
+#         exam.save()
+#         # save_exam_id(exam_id)
+#         # redirect to a success page
+#         return redirect('login:create_set', subject_id=subject_id, exam_id=exam_id)
+
+#     if session_teacher[0] == "true":
+#         homepage_teacher.insert(0, "true")
+#         return render(request, 'courses/new_exam.html', context)
+#     else:
+#         return redirect('/')
 
 
 def exam_detail(request, subject_id, exam_id):
-    xm_id = save_exam_id
+    # xm_id = save_exam_id
     sub = get_list_or_404(subject, subject_id=subject_id)
     xm = get_list_or_404(exams, exam_id=exam_id)
     context = {
@@ -372,11 +328,18 @@ def exam_detail(request, subject_id, exam_id):
         return redirect('/')
 
 
+def delete_exam(request, subject_id, exam_id):
+    exam = get_object_or_404(exams, exam_id=exam_id)
+    print(exam)
+    exam.delete()
+    return redirect('login:course_detail', subject_id=subject_id)
+
+
 def st_exam_detail(request, subject_id, exam_id):
-    xm_id = save_exam_id
+    # xm_id = save_exam_id
     sub = get_list_or_404(subject, subject_id=subject_id)
     xm = get_list_or_404(exams, exam_id=exam_id)
-    print("user name:", uname)
+    # print("user name:", uname)
 
     context = {
         'sub': sub,
@@ -384,7 +347,7 @@ def st_exam_detail(request, subject_id, exam_id):
         'subject_id': subject_id,
         'exam_id': exam_id,
     }
-    render(request, 'courses/st_exam_detail.html', context)
+    # render(request, 'courses/st_exam_detail.html', context)
     if session_student[0] == "true":
         homepage_student.insert(0, "true")
         return render(request, 'courses/st_exam_detail.html', context)
@@ -394,11 +357,15 @@ def st_exam_detail(request, subject_id, exam_id):
 
 def take_exam(request, subject_id, exam_id):
 
-    xm_id = save_exam_id
+    # xm_id = save_exam_id
     sub = get_list_or_404(subject, subject_id=subject_id)
     xm = get_list_or_404(exams, exam_id=exam_id)
     ques_set = get_list_or_404(question_set, exam_id=exam_id)
     global uname
+    uname = uname.lower()
+    print("uname in take exam:",uname)
+    usr = get_list_or_404(user, username=uname)
+    print("take exam usr:", usr[0], "usr id", usr[0].user_id)
     # get questions
     ques = get_list_or_404(question, set_id_id=ques_set[0].set_id)
     # q_set_id = ques_set[0].set_id
@@ -412,6 +379,7 @@ def take_exam(request, subject_id, exam_id):
     user_name = uname
     usr = get_list_or_404(user, username=user_name)
     uid = usr[0].user_id
+    print("uid:", uid)
     # ger response texts
     if request.method == 'POST':
         res_text1 = request.POST['res_text1']
@@ -529,8 +497,6 @@ def take_exam(request, subject_id, exam_id):
             [processed_text, processed_text1])
 
         # Calculate the Jaccard similarity
-        # jaccard_distance2 = jaccard.jaccard_similarity(
-        #     tfidf_matrix[0].toarray().flatten(), tfidf_matrix[1].toarray().flatten())
         s1, s2 = pre.preprocess(s1, s2)
         sc = jac.jaccard_similarity(s1, s2)
         jac_scr2 = sc
@@ -587,12 +553,6 @@ def take_exam(request, subject_id, exam_id):
         return render(request, 'courses/take_exam.html', context)
     else:
         return redirect('/')
-    # return render(request, 'answer.html', question)
-
-    # save_exam_id(exam_id)
-    # redirect to a success page
-    # return redirect('login:create_set', subject_id=subject_id, exam_id=exam_id)
-    # return redirect('exhibition:map', lat=48.128365, lng=11.5662713, zoom=3)
 
 
 def create_set(request, subject_id, exam_id):

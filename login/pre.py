@@ -1,32 +1,32 @@
 import re
-import spacy
+# import spacy
 import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 
 
-def lemmatize(sentence):
-    # Load the English language model
-    nlp = spacy.load("en_core_web_sm")
+# def lemmatize(sentence):
+#     # Load the English language model
+#     nlp = spacy.load("en_core_web_sm")
 
-    ar = nlp.get_pipe("attribute_ruler")
+#     ar = nlp.get_pipe("attribute_ruler")
 
-    ar.add([[{'TEXT': 'bruh'}], [{'TEXT': 'bruv'}], [
-           {'TEXT': 'bro'}], [{'TEXT': 'broh'}]], {'LEMMA': 'Brother'})
+#     ar.add([[{'TEXT': 'bruh'}], [{'TEXT': 'bruv'}], [
+#            {'TEXT': 'bro'}], [{'TEXT': 'broh'}]], {'LEMMA': 'Brother'})
 
-    # Example sentence
-    # sentence = "bruv playing each other ball talkative cat slower abode worn"
+#     # Example sentence
+#     # sentence = "bruv playing each other ball talkative cat slower abode worn"
 
-    # Process the sentence by the lemmatizer
-    doc = nlp(sentence)
+#     # Process the sentence by the lemmatizer
+#     doc = nlp(sentence)
 
-    # Get the lemmatized tokens
-    lemmatized_words = [token.lemma_ for token in doc]
+#     # Get the lemmatized tokens
+#     lemmatized_words = [token.lemma_ for token in doc]
 
-    # Print the lemmatized words
-    # print('lemmatized',lemmatized_words)
-    return lemmatized_words
+#     # Print the lemmatized words
+#     # print('lemmatized',lemmatized_words)
+#     return lemmatized_words
 
 
 def negate_sequence(text):
@@ -72,10 +72,10 @@ def preprocess(s1, s2):
     tokens = [token for token in tokens if token not in stop_words]
     s2 = ' '.join(tokens)
 
-    s1 = lemmatize(s1)
-    s2 = lemmatize(s2)
-    s1 = ' '.join(s1)
-    s2 = ' '.join(s2)
+    # s1 = lemmatize(s1)
+    # s2 = lemmatize(s2)
+    # s1 = ' '.join(s1)
+    # s2 = ' '.join(s2)
 
     punctuation_pattern = r'[^\w\s]'
     s1 = re.sub(punctuation_pattern, '', s1)

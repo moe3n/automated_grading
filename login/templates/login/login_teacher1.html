@@ -1,53 +1,42 @@
-<html>
-  <head>
-      <meta charset="utf-8">
-      
-      <title>Student Grading </title>
-      
+{% extends 'base_layout.html' %} {% block content %}
 
-  </head>
-    
-  {% load static %}
+{% load static %}
   <link rel="stylesheet" href="{% static 'login.css' %}">
-
-  
-  <body> 
       
-    <div class="form-div"">
+    <div class="containers"">
+      <div class="image">
+        {% load static %}
+          <img src="{% static 'images/login.jpg'%}" alt="your-image.jpg" style="height: 25rem;">
+      </div>
+      <div class="form">
+        <h1 class="title">Teacher log in </h1>
+        <form action="" method="POST">
+          {% csrf_token %}
+
+
+            <input type="text" name="username" placeholder="📧 Username" required/>
+
+            <input type="password" name="password"  placeholder="🔑 Password" required/>
+
+
         
-          <h1 class="title">Teacher log in </h1>
-          
-          <form action="" method="POST">
-            {% csrf_token %}
-            <div class="form-control">
-                <br>
-              <input type="text" name="username" placeholder="ENTER YOUR USER NAME" required/>
-              <br>
-              <input type="password" name="password"  placeholder="ENTER YOUR USER NAME" required/>
-              <br>
-            </div>
-          
-           
-            <input class="submit-button" type="submit" value="LOG IN" > 
-            <br>
-            <br>
-            <button class="submit-button"><a href="http://127.0.0.1:8000/">Homepage</a> </a> </button>
-    
-          </form>
+         
+          <input  class="submit-button" type="submit" value="LOG IN" > 
 
+          <button type="button" class="submit-button"><a href="http://127.0.0.1:8000/">Homepage</a> </button>
+  
+        </form>
+      </div>
     </div> 
-            <!-- used for alert     -->
-            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-            
-            {% if messages %}
-            {% for message in messages %}
-           <script>
-           swal("{{ message }}");
-           </script>
-           {% endfor %}
-          {% endif %}
 
-     </body>
-    
-      </html>
+          <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>    
+         
+          {% if messages %}
+          {% for message in messages %}
+         <script>
+         swal("{{ message }}");
+          </script>
+         {% endfor %}
+        {% endif %}
 
+      {% endblock %}

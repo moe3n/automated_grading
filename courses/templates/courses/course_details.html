@@ -17,7 +17,7 @@
   <li class="list-group-item list-group-item-light fw-bold">
     <a
     class="text-primary"
-      href="http://127.0.0.1:8000/teacher/dashboard/{{sub.0.subject_id}}/{{exam.exam_id}}"
+      href="{% url 'login:exam_detail' subject_id=sub.0.subject_id exam_id=exam.exam_id %}"
       >{{ exam.exam_name }}</a
     >
   </li>

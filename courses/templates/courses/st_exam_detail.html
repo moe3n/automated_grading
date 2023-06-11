@@ -6,7 +6,7 @@
   Exam Details
 </p>
 <div class="btn btn-primary">
-  <a class="text-white" href="{% url 'login:take_exam' subject_id=subject_id exam_id=exam_id%}"
+  <a class="text-white" href="http://127.0.0.1:8000/student/dashboard/{{ subject_id }}/{{exam_id}}/take_exam"
     >Take Exam</a
   ></div>
 
@@ -15,5 +15,6 @@
 
   <div class="btn btn-outline-success">See Result</div>
 
-  {% endblock %}
+  
 </div>
+{% endblock %}

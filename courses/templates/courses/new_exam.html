@@ -9,15 +9,15 @@
   class="form-control"
   name="exam"
   method="POST"
-  action="{% url 'login:create_exam' subject_id=subject_id%}"
+  action="{% url 'login:create_exam' subject_id=subject_id %}"
 >
   {% csrf_token %}
   <label class="py-1" for="exam_id">Exam ID:</label>
   <input class="form-control" type="text" name="exam_id" id="exam_id" />
   <label class="py-1" for="exam_name">Exam name:</label>
   <input class="form-control" type="text" name="exam_name" id="exam_name" />
-  <!-- <label class="py-1" for="set_number">Question Set Number(1,2,3):</label>
-  <input class="form-control" type="text" name="set_number" id="set_number" /> -->
+
+ 
   <button
     type="submit"
     class="btn btn-outline-primary btn-lg mt-5 float-sm-end"
