@@ -6,8 +6,8 @@ urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('register/', views.register_user, name='register'),
     path('create_subject/', views.register_subject, name='subj'),
-    path('teacher/login/', views.login_teacher),
-    path('student/login/', views.login_student),
+    path('teacher/login/', views.login_teacher, name='login_teacher'),
+    path('student/login/', views.login_student, name='login_student'),
     path('teacher/dashboard/', views.teacher_dashboard),
 
     path('teacher/dashboard/<int:subject_id>/',

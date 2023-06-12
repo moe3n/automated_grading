@@ -363,7 +363,7 @@ def take_exam(request, subject_id, exam_id):
     ques_set = get_list_or_404(question_set, exam_id=exam_id)
     global uname
     uname = uname.lower()
-    print("uname in take exam:",uname)
+    print("uname in take exam:", uname)
     usr = get_list_or_404(user, username=uname)
     print("take exam usr:", usr[0], "usr id", usr[0].user_id)
     # get questions

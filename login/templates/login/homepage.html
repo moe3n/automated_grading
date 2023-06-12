@@ -19,8 +19,8 @@
     <p class="display-1 text-primary pb-5">Welcome </p>
     <p class="display-4 text-dark pb-5">I'm a ... </p>
     {% load static %}
-  <button class=" btn btn-info me-2 btn-lg"><a  href="http://127.0.0.1:8000/teacher/login/">Teacher</a>  </a></button> 
-  <button class="btn btn-primary text-light btn-lg"><a class="text-light" href="http://127.0.0.1:8000/student/login/">Student</a> </a> </button>
+  <button class=" btn btn-info me-2 btn-lg"><a  href="{% url 'login:login_teacher' %}">Teacher</a>  </a></button> 
+  <button class="btn btn-primary text-light btn-lg"><a class="text-light" href="{% url 'login:login_student' %}">Student</a> </a> </button>
   </div>
 
 
