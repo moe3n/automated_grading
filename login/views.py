@@ -4,22 +4,21 @@ from database.models import user
 from login.forms import UserRegistrationForm, SubjectForm, ExamForm
 
 from database.models import subject, exams, score, question_set, question, response, answer, user
-from django.db import connection
-from operator import itemgetter
+
 from django.contrib import messages
 from . import jaro2, leven, jac, pre  # hamming
 import nltk
 import string
 from nltk.tokenize import word_tokenize
 from scipy.spatial.distance import hamming
-from Levenshtein import distance
+
 from nltk.corpus import stopwords
 
 # jaccard
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import FunctionTransformer
+
 import string
-from scipy.spatial import distance
+
 # cosine
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -486,7 +485,7 @@ def take_exam(request, subject_id, exam_id):
         tokens1 = word_tokenize(inp1.lower())
         tokens1 = [
             token for token in tokens1 if token not in string.punctuation]
-        stop_words1 = set(stopwords.words('english'))
+        # stop_words1 = set(stopwords.words('english'))
         tokens1 = [
             token for token in tokens1 if token not in stop_words]
         processed_text1 = ' '.join(tokens1)
