@@ -354,6 +354,29 @@ def st_exam_detail(request, subject_id, exam_id):
         return redirect('/')
 
 
+def choose_most_frequent_score(score_answer1, score_answer_jw2, jac_scr2, ham_scr2, cos_score2):
+    # Get the frequencies of each score.
+    score_answer1 = math.ceil(score_answer1)
+    score_answer_jw2 = math.ceil(score_answer_jw2)
+    jac_scr2 = math.ceil(jac_scr2)
+    ham_scr2 = math.ceil(ham_scr2)
+    cos_score2 = math.ceil(cos_score2)
+
+    frequencies = {}
+    for score in [score_answer1, score_answer_jw2, jac_scr2, ham_scr2, cos_score2]:
+        if score not in frequencies:
+            frequencies[score] = 1
+        else:
+            frequencies[score] += 1
+    # Find the most frequent score.
+    most_frequent_score = max(frequencies.keys(), key=frequencies.get)
+    # If there are two scores with the same frequency, choose the highest score.
+    if frequencies[most_frequent_score] == 1:
+        return max(frequencies.keys())
+    else:
+        return most_frequent_score
+
+
 def take_exam(request, subject_id, exam_id):
 
     # xm_id = save_exam_id
@@ -400,9 +423,10 @@ def take_exam(request, subject_id, exam_id):
 
         # print("The similarity of question" ":", similarity_score)
         score_answer = 10*similarity_score
+        score_answer = round(score_answer, 2)
         jw_similarity = jaro2.jaro_winkler(s1, s2)
         score_answer_jw = 10*jw_similarity
-
+        score_answer_jw = round(score_answer_jw, 2)
         # ------ jaccard------
 
         inp = standard_answer1
@@ -437,6 +461,7 @@ def take_exam(request, subject_id, exam_id):
         sc = jac.jaccard_similarity(s1, s2)
         jac_scr1 = sc
         jac_scr1 = jac_scr1 * 10
+        jac_scr1 = round(jac_scr1, 2)
 
         # --------- hamming---
 
@@ -444,14 +469,18 @@ def take_exam(request, subject_id, exam_id):
         ).flatten(), tfidf_matrix[1].toarray().flatten())
         hamming_score1 = 1 - hamming_distance
         ham_scr1 = hamming_score1*10
+        ham_scr1 = round(ham_scr1, 2)
         # -------- end hamming
         # cosine ---
         cos_distance = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])
         cos_distance = float(cos_distance[0])
         # Calculate the similarity score
         cos_score1 = cos_distance*10
+        cos_score1 = round(cos_score1, 2)
 
-        cm_scr1 = max(score_answer, score_answer_jw)
+        cm_scr1 = choose_most_frequent_score(
+            score_answer, score_answer_jw, jac_scr1, ham_scr1, cos_score1)
+
         # save score
         save_scr1 = score.objects.create(
             question_id_id=ques[0].question_id, user_id_id=uid, score=score_answer)
@@ -467,9 +496,11 @@ def take_exam(request, subject_id, exam_id):
         s1, s2 = standard_answer2, res_text2
         similarity_score = leven.levenshtein_similarity(s1, s2)
         score_answer1 = 10*similarity_score
+        score_answer1 = round(score_answer1, 2)
         # ------ jw2---
         jw_similarity = jaro2.jaro_winkler(s1, s2)
         score_answer_jw2 = 10*jw_similarity
+        score_answer_jw2 = round(score_answer_jw2, 2)
 
         # jaccard2
         inp = standard_answer2
@@ -500,12 +531,14 @@ def take_exam(request, subject_id, exam_id):
         sc = jac.jaccard_similarity(s1, s2)
         jac_scr2 = sc
         jac_scr2 = jac_scr2 * 10
+        jac_scr2 = round(jac_scr2, 2)
         # end jaccard
         # hamming2
         hamming_distance = hamming(tfidf_matrix[0].toarray(
         ).flatten(), tfidf_matrix[1].toarray().flatten())
         hamming_score2 = 1 - hamming_distance
         ham_scr2 = hamming_score2*10
+        ham_scr2 = round(ham_scr2, 2)
 
         # cosine2 ---
         cos_distance = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])
@@ -513,9 +546,16 @@ def take_exam(request, subject_id, exam_id):
 
         # Calculate the similarity score
         cos_score2 = cos_distance*10
+        cos_score2 = round(cos_score2, 2)
+
+        # choose the most frequent score among score_answer1, score_answer_jw2, jac_scr2, ham_scr2, cos_score2
+        # if among these five scores any two scores are same then choose that score
+        # else choose the highest score
+        # provide the code
 
         # choosen score 2 of all algos
-        cm_scr2 = max(score_answer1, score_answer_jw2)
+        cm_scr2 = choose_most_frequent_score(
+            score_answer1, score_answer_jw2, jac_scr2, ham_scr2, cos_score2)
         save_scr2 = score.objects.create(
             question_id_id=ques[0].question_id, user_id_id=uid, score=score_answer1)
         # save_scr2.save()
@@ -659,7 +699,7 @@ def st_result(request, subject_id, exam_id):
     context = {
         'scores': scores
     }
-    return render(request, 'course/st_result.html', context)
+    return render(request, 'login/result.html', context)
 
 
 def logout_user(request):

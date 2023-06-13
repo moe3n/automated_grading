@@ -2,10 +2,10 @@
 
 
 
-<table class="table table-info table-hover " style="border-radius: 1.5rem;">
+<table class="table table table-info table-hover ">
   <thead>
-    <tr>
-      <th scope="col">Ques No.</th>
+    <tr class="table-primary">
+      <th scope="col">S/N</th>
       <th scope="col">Levenshtein</th>
       <th scope="col">Jaro-Winkler</th>
       <th scope="col">Hamming</th>
@@ -14,19 +14,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
+    <tr >
       <th scope="row">1</th>
-      <td>{{ score}}</td>
-      <td>{{ jw1}}</td>
+      <td>{{ score }}</td>
+      <td>{{ jw1 }}</td>
       <td>{{ ham1 }}</td>
-      <td>{{ jac1}}</td>
-      <td>{{ cos1}}</td>
+      <td>{{ jac1 }}</td>
+      <td>{{ cos1 }}</td>
       
     </tr>
     <tr>
       <th scope="row">2</th>
       <td>{{ score2}}</td>
-      <td>{{ jw2}}</td>
+      <td>{{ jw2 }}</td>
       <td>{{ ham2 }}</td>
       <td>{{ jac2 }}</td>
       <td>{{ cos2 }}</td>
@@ -37,7 +37,7 @@
 </table>
 
       <br> 
-      <p class="fs-3 text-danger""> Total:{{total_value}}</p>
+      <p class="fs-3  fw-bold text-primary"> Total:{{total_value}}</p>
       <!-- <button class="btn btn-md btn-info"><a class="" href="http://127.0.0.1:8000/student/answer/">Re-Answer</a> </a> </button> -->
     </div>
 {%endblock%}
